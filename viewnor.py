@@ -4,10 +4,11 @@ from pygame.color import THECOLORS
 
 def parse_line(f):
     k = f.readline()
-    print(k[:-1].split())
-    return map(int,k[:-1].split())
+    if k[len(k)-1] == '\n':
+        return map(int,k[:-1].split())
+    return map(int,k.split())
 
-def draw(flat,sizex,sizey,x,y,colo):#Отрисовка поля
+def draw(flat,sizex,sizey,agents):#Отрисовка поля
     numstr = 0
     numstol = 0
     for n in flat:
@@ -22,11 +23,16 @@ def draw(flat,sizex,sizey,x,y,colo):#Отрисовка поля
                                         (sizex*(numstol-1),sizey*numstr),(sizex*numstol,sizey*numstr)
                                         ,(sizex*numstol,sizey*(numstr-1))])
             #Игрок
-            if numstol==x and numstr==y:
-                cent = (sizex*(numstol-1)+(sizex/2),sizey*(numstr-1)+(sizey/2))
-                pg.draw.circle(screen,THECOLORS["yellow"],cent,min(sizex/2,sizey/2))
-
-                pg.draw.circle(screen,THECOLORS[colo],cent,min(sizex/10,sizey/10))
+            for agent in agents:
+                print(agent,numstol,numstr)
+                if numstol==agent[1] and numstr==agent[0]:
+                    if agent[2]:
+                        colo = 'green'
+                    else:
+                        colo = 'red'
+                    cent = (sizex*(numstol-1)+(sizex/2),sizey*(numstr-1)+(sizey/2))
+                    pg.draw.circle(screen,THECOLORS["yellow"],cent,min(sizex/2,sizey/2))
+                    pg.draw.circle(screen,THECOLORS[colo],cent,min(sizex/10,sizey/10))
                 
 
 
@@ -36,7 +42,6 @@ if __name__ == "__main__":
     filename = input()#sys.argv[1]
     f = open(filename)
     m,n = parse_line(f)
-    is_on = False
     
     screen = pg.display.set_mode((800,600))
     
@@ -44,7 +49,13 @@ if __name__ == "__main__":
     
     for i in range(m):
         flat.append(list(parse_line(f)))
-    x,y = parse_line(f)
+    
+    agents = []
+    
+    counag = int(f.readline()[:-1])
+    for l in range(counag):
+        x,y = parse_line(f)
+        agents.append([x,y,False])
     
     view_flat = vx,vy = int(screen.get_width()*(2/3)) , int(screen.get_height()*(2/3))
     #Всякая Информация вне экрана
@@ -64,20 +75,21 @@ if __name__ == "__main__":
     #Кнопка
     #Всякая Информация вне экрана
     
+    cur = 0
     
     while True:
         #Рамка
         pg.draw.polygon(screen,THECOLORS["green"],[(0,0),(vx,0),(vx,vy),(0,vy)],2)
         
         #Отрисовка поля и агента
-        draw(flat,screen.get_width()*(2/3)/n,screen.get_height()*(2/3)/m,x,y,col)
+        draw(flat,screen.get_width()*(2/3)/n,screen.get_height()*(2/3)/m,agents)
         
         #Отрисовка текста
         text= font.render(str(tx),True,THECOLORS[col])
         screen.blit(text,(vx+vx*(1/10),10))
         
         #Если выключно то поменять цвет тескта и сам текст и наоборот
-        if is_on:
+        if agents[cur][2]:
             colb = 'red'
             col = 'green'
             tx = 'its on now'
@@ -97,31 +109,37 @@ if __name__ == "__main__":
                 #Если игрок нажал на кнопку то выкл. или вкл.
                 if event.pos[0] > butcoor[0][0] and event.pos[0] < butcoor[3][0]:
                     if event.pos[1] > butcoor[0][1] and event.pos[1] < butcoor[1][1]:
-                        is_on = not(is_on)
+                        agents[cur][2] = not(agents[cur][2])
             if event.type == pg.KEYDOWN:
+                try:
+                    ent = int(pg.key.name(event.key))
+                    if ent<=len(agents)-1:
+                        cur = ent
+                except:
+                    _____ = 0
                 if event.key == pg.K_SPACE:
-                    if is_on and flat[y-1][x-1] == 1:
-                        flat[y-1][x-1] = 0
+                    if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 1:
+                        flat[agents[cur][0]-1][agents[cur][1]-1] = 0
                 if event.key == pg.K_g:
-                    if is_on and flat[y-1][x-1] == 0:
-                        flat[y-1][x-1] = 1
+                    if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 0:
+                        flat[agents[cur][0]-1][agents[cur][1]-1] = 1
                 if event.key == pg.K_o:
-                    is_on = True
+                    agents[cur][2] = True
                 if event.key == pg.K_f:
-                    is_on = False
-                if is_on:
+                    agents[cur][2] = False
+                if agents[cur][2]:
                     if event.key == pg.K_LEFT:
-                        if x>1:
-                            x-=1
+                        if agents[cur][1]>1:
+                            agents[cur][1]-=1
                     if event.key == pg.K_RIGHT:
-                        if x<n:
-                            x+=1
+                        if agents[cur][1]<n:
+                            agents[cur][1]+=1
                     if event.key == pg.K_UP:
                         
-                        if y>1:
-                            y-=1
+                        if agents[cur][0]>1:
+                            agents[cur][0]-=1
                     if event.key == pg.K_DOWN:
                         
-                        if y<m:
-                            y+=1
+                        if agents[cur][0]<m:
+                            agents[cur][0]+=1
         screen.fill((0,0,0))
