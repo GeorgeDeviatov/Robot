@@ -89,7 +89,7 @@ if __name__ == "__main__":
         screen.blit(text,(vx+vx*(1/10),10))
         
         #Если выключно то поменять цвет тескта и сам текст и наоборот
-        if agents[cur][2]:
+        if len(agents)>0 and agents[cur][2]:
             colb = 'red'
             col = 'green'
             tx = 'its on now'
@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 print(event.pos,butcoor)
                 #Если игрок нажал на кнопку то выкл. или вкл.
                 if event.pos[0] > butcoor[0][0] and event.pos[0] < butcoor[3][0]:
-                    if event.pos[1] > butcoor[0][1] and event.pos[1] < butcoor[1][1]:
+                    if event.pos[1] > butcoor[0][1] and event.pos[1] < butcoor[1][1] and len(agents)>0:
                         agents[cur][2] = not(agents[cur][2])
             if event.type == pg.KEYDOWN:
                 try:
@@ -117,17 +117,20 @@ if __name__ == "__main__":
                         cur = ent
                 except:
                     _____ = 0
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_SPACE and len(agents)>0:
                     if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 1:
                         flat[agents[cur][0]-1][agents[cur][1]-1] = 0
-                if event.key == pg.K_g:
+                if event.key == pg.K_g and len(agents)>0:
                     if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 0:
                         flat[agents[cur][0]-1][agents[cur][1]-1] = 1
-                if event.key == pg.K_o:
+                if event.key == pg.K_o and len(agents)>0:
                     agents[cur][2] = True
-                if event.key == pg.K_f:
+                if event.key == pg.K_f and len(agents)>0:
                     agents[cur][2] = False
-                if agents[cur][2]:
+                if event.key == pg.K_k and len(agents) > 0:
+                    agents.pop(cur)
+                    cur = 0
+                if len(agents)>0 and agents[cur][2]:
                     if event.key == pg.K_LEFT:
                         if agents[cur][1]>1:
                             agents[cur][1]-=1
