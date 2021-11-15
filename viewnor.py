@@ -7,7 +7,7 @@ def parse_line(f):
     print(k[:-1].split())
     return map(int,k[:-1].split())
 
-def draw(flat,sizex,sizey,x,y,colo):
+def draw(flat,sizex,sizey,x,y,colo):#Отрисовка поля
     numstr = 0
     numstol = 0
     for n in flat:
@@ -21,7 +21,7 @@ def draw(flat,sizex,sizey,x,y,colo):
             pg.draw.polygon(screen,col,[(sizex*(numstol-1),sizey*(numstr-1)),
                                         (sizex*(numstol-1),sizey*numstr),(sizex*numstol,sizey*numstr)
                                         ,(sizex*numstol,sizey*(numstr-1))])
-            
+            #Игрок
             if numstol==x and numstr==y:
                 cent = (sizex*(numstol-1)+(sizex/2),sizey*(numstr-1)+(sizey/2))
                 pg.draw.circle(screen,THECOLORS["yellow"],cent,min(sizex/2,sizey/2))
@@ -31,6 +31,7 @@ def draw(flat,sizex,sizey,x,y,colo):
 
 
 if __name__ == "__main__":
+    #Загрузка информации из файла
     pg.init()
     filename = input()#sys.argv[1]
     f = open(filename)
@@ -47,25 +48,56 @@ if __name__ == "__main__":
     
     view_flat = vx,vy = int(screen.get_width()*(2/3)) , int(screen.get_height()*(2/3))
     #Всякая Информация вне экрана
-    col = 'red'
-    tx = 'off'
-    font = pg.font.SysFont('corbel',50)
-    text= font.render(str('off'),True,THECOLORS[col])
-    screen.blit(text,(vx+10,10))
     
+    #Текст
+    col = 'red'
+    tx = 'its off now'
+    font = pg.font.SysFont('corbel',50)
+    text= font.render(tx,True,THECOLORS[col])
+    screen.blit(text,(vx+10,10))
+    #Текст
+    
+    #Кнопка
+    butcoor = [(vx+vx*0.2,vy*0.2),(vx+vx*0.2,vy*0.4),(vx+vx*0.4,vy*0.4),
+                                                     (vx+vx*0.4,vy*0.2)]
+    pg.draw.polygon(screen, THECOLORS['white'], butcoor)
+    #Кнопка
     #Всякая Информация вне экрана
     
     
     while True:
+        #Рамка
         pg.draw.polygon(screen,THECOLORS["green"],[(0,0),(vx,0),(vx,vy),(0,vy)],2)
+        
+        #Отрисовка поля и агента
         draw(flat,screen.get_width()*(2/3)/n,screen.get_height()*(2/3)/m,x,y,col)
+        
+        #Отрисовка текста
         text= font.render(str(tx),True,THECOLORS[col])
-        screen.blit(text,(vx+10,10))
+        screen.blit(text,(vx+vx*(1/10),10))
+        
+        #Если выключно то поменять цвет тескта и сам текст и наоборот
+        if is_on:
+            colb = 'red'
+            col = 'green'
+            tx = 'its on now'
+        else:
+            colb = 'green'
+            col = 'red'
+            tx = 'its off now'
+        pg.draw.polygon(screen, THECOLORS[colb], butcoor)
+        
         pg.display.flip()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
+            if event.type == pg.MOUSEBUTTONDOWN:
+                print(event.pos,butcoor)
+                #Если игрок нажал на кнопку то выкл. или вкл.
+                if event.pos[0] > butcoor[0][0] and event.pos[0] < butcoor[3][0]:
+                    if event.pos[1] > butcoor[0][1] and event.pos[1] < butcoor[1][1]:
+                        is_on = not(is_on)
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_SPACE:
                     if is_on and flat[y-1][x-1] == 1:
@@ -75,12 +107,8 @@ if __name__ == "__main__":
                         flat[y-1][x-1] = 1
                 if event.key == pg.K_o:
                     is_on = True
-                    col = 'green'
-                    tx = 'on'
                 if event.key == pg.K_f:
                     is_on = False
-                    col = 'red'
-                    tx = 'off'
                 if is_on:
                     if event.key == pg.K_LEFT:
                         if x>1:
