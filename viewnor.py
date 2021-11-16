@@ -161,7 +161,7 @@ if __name__ == "__main__":
                         agents[cur][2] = not(agents[cur][2])
                  
                 if event.pos[0] > adbutcoor[0][0] and event.pos[0] < adbutcoor[3][0]:
-                    if event.pos[1] > adbutcoor[0][1] and event.pos[1] < adbutcoor[1][1] and len(agents)>0:
+                    if event.pos[1] > adbutcoor[0][1] and event.pos[1] < adbutcoor[1][1]:
                         
                         agents.append([1,1,False])
                         
