@@ -24,7 +24,7 @@ def draw(flat,sizex,sizey,agents):#Отрисовка поля
                                         ,(sizex*numstol,sizey*(numstr-1))])
             #Игрок
             for agent in agents:
-                print(agent,numstol,numstr)
+                #print(agent,numstol,numstr)
                 if numstol==agent[1] and numstr==agent[0]:
                     if agent[2]:
                         colo = 'green'
@@ -39,8 +39,8 @@ def draw(flat,sizex,sizey,agents):#Отрисовка поля
 if __name__ == "__main__":
     #Загрузка информации из файла
     pg.init()
-    filename = input()#sys.argv[1]
-    f = open(filename)
+    #filename = input()#sys.argv[1]
+    f = open('flat.txt')
     m,n = parse_line(f)
     
     screen = pg.display.set_mode((800,600))
@@ -53,6 +53,7 @@ if __name__ == "__main__":
     agents = []
     
     counag = int(f.readline()[:-1])
+    cur = 0
     for l in range(counag):
         x,y = parse_line(f)
         agents.append([x,y,False])
@@ -60,22 +61,33 @@ if __name__ == "__main__":
     view_flat = vx,vy = int(screen.get_width()*(2/3)) , int(screen.get_height()*(2/3))
     #Всякая Информация вне экрана
     
-    #Текст
+    #Текст вкл./выкл.
     col = 'red'
     tx = 'its off now'
     font = pg.font.SysFont('corbel',50)
     text= font.render(tx,True,THECOLORS[col])
     screen.blit(text,(vx+10,10))
-    #Текст
+    #Текст кол-во агентов-роботов
+    txc = len(agents)
+    font2 = pg.font.SysFont('corbel',50)
+    text2 = font.render(tx,True,THECOLORS['yellow'])
+    screen.blit(text,(10,vy+10))
+    #Текст текущий агент-робот
+    fontcur = pg.font.SysFont('corbel',50)
+    textcur = fontcur.render(str(cur),True,THECOLORS['purple'])
+    screen.blit(textcur,(vx+50,vy+50))
     
-    #Кнопка
+    #Кнопка вкл./выкл.
     butcoor = [(vx+vx*0.2,vy*0.2),(vx+vx*0.2,vy*0.4),(vx+vx*0.4,vy*0.4),
                                                      (vx+vx*0.4,vy*0.2)]
     pg.draw.polygon(screen, THECOLORS['white'], butcoor)
-    #Кнопка
+    
+    
+    #Кнопка добавления агентов
+    adbutcoor = [(10,vy+120),(10,vy+180),(70,vy+180),(70,vy+120)]
+    pg.draw.polygon(screen,THECOLORS['orange'],adbutcoor)
     #Всякая Информация вне экрана
     
-    cur = 0
     
     while True:
         #Рамка
@@ -85,8 +97,21 @@ if __name__ == "__main__":
         draw(flat,screen.get_width()*(2/3)/n,screen.get_height()*(2/3)/m,agents)
         
         #Отрисовка текста
+        if len(agents)==0:
+            tx = 'No agents'
+            col = 'darkred'
         text= font.render(str(tx),True,THECOLORS[col])
         screen.blit(text,(vx+vx*(1/10),10))
+            
+        
+        #Отрисовка кол-ва агентво-роботов-пылесосов
+        txc = len(agents)
+        text2= font2.render(str(txc),True,THECOLORS['yellow'])
+        screen.blit(text2,(10,vy+10))
+        
+        #Отрисовка номера текущего робота
+        textcur = fontcur.render(str(cur),True,THECOLORS['purple'])
+        screen.blit(textcur,(vx+50,vy+50))
         
         #Если выключно то поменять цвет тескта и сам текст и наоборот
         if len(agents)>0 and agents[cur][2]:
@@ -97,7 +122,14 @@ if __name__ == "__main__":
             colb = 'green'
             col = 'red'
             tx = 'its off now'
-        pg.draw.polygon(screen, THECOLORS[colb], butcoor)
+        
+        #Кнопки
+        if len(agents)>0:
+            pg.draw.polygon(screen, THECOLORS[colb], butcoor)
+        
+        
+        pg.draw.polygon(screen,THECOLORS['orange'],adbutcoor)
+        
         
         pg.display.flip()
         for event in pg.event.get():
@@ -105,11 +137,17 @@ if __name__ == "__main__":
                 pg.quit()
                 sys.exit()
             if event.type == pg.MOUSEBUTTONDOWN:
-                print(event.pos,butcoor)
+                #print(event.pos,butcoor)
                 #Если игрок нажал на кнопку то выкл. или вкл.
                 if event.pos[0] > butcoor[0][0] and event.pos[0] < butcoor[3][0]:
                     if event.pos[1] > butcoor[0][1] and event.pos[1] < butcoor[1][1] and len(agents)>0:
                         agents[cur][2] = not(agents[cur][2])
+                 
+                if event.pos[0] > adbutcoor[0][0] and event.pos[0] < adbutcoor[3][0]:
+                    if event.pos[1] > adbutcoor[0][1] and event.pos[1] < adbutcoor[1][1] and len(agents)>0:
+                        agents.append([1,1,False])
+                        
+                
             if event.type == pg.KEYDOWN:
                 try:
                     ent = int(pg.key.name(event.key))
