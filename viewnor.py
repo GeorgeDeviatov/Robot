@@ -86,6 +86,14 @@ if __name__ == "__main__":
     #Кнопка добавления агентов
     adbutcoor = [(10,vy+120),(10,vy+180),(70,vy+180),(70,vy+120)]
     pg.draw.polygon(screen,THECOLORS['orange'],adbutcoor)
+    
+    #Кнопка выбора текущего агента-робота-пылесоса
+    colforchoose = 'darkblue'
+    counbutcoor = [(110,vy+120),(110,vy+180),(170,vy+180),(170,vy+120)]
+    pg.draw.polygon(screen,colforchoose,counbutcoor)
+    
+    nowof = True
+    num = ""
     #Всякая Информация вне экрана
     
     
@@ -131,12 +139,21 @@ if __name__ == "__main__":
         pg.draw.polygon(screen,THECOLORS['orange'],adbutcoor)
         
         
+        #Кнопка выбора текущего агента-робота-пылесоса
+        if nowof:
+            colforchoose = 'darkblue'
+        else:
+            colforchoose = 'blue'
+        counbutcoor = [(110,vy+120),(110,vy+180),(170,vy+180),(170,vy+120)]
+        pg.draw.polygon(screen,colforchoose,counbutcoor)
+        
+        
         pg.display.flip()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-            if event.type == pg.MOUSEBUTTONDOWN:
+            if event.type == pg.MOUSEBUTTONDOWN:#Куча кнопок
                 #print(event.pos,butcoor)
                 #Если игрок нажал на кнопку то выкл. или вкл.
                 if event.pos[0] > butcoor[0][0] and event.pos[0] < butcoor[3][0]:
@@ -145,16 +162,29 @@ if __name__ == "__main__":
                  
                 if event.pos[0] > adbutcoor[0][0] and event.pos[0] < adbutcoor[3][0]:
                     if event.pos[1] > adbutcoor[0][1] and event.pos[1] < adbutcoor[1][1] and len(agents)>0:
+                        
                         agents.append([1,1,False])
+                        
+                if event.pos[0] > counbutcoor[0][0] and event.pos[0] < counbutcoor[3][0]:
+                    if event.pos[1] > counbutcoor[0][1] and event.pos[1] < counbutcoor[1][1] and len(agents)>0:
+                        
+                        
+                        was = nowof
+                        nowof = not(nowof)
+                        if nowof and not(was):
+                            try:
+                                num = int(num)
+                                if num<len(agents):
+                                    cur = num
+                                num = ''
+                            except:
+                                print("NO")
+                                num = ''
                         
                 
             if event.type == pg.KEYDOWN:
-                try:
-                    ent = int(pg.key.name(event.key))
-                    if ent<=len(agents)-1:
-                        cur = ent
-                except:
-                    _____ = 0
+                if not(nowof):
+                    num+=(pg.key.name(event.key))
                 if event.key == pg.K_SPACE and len(agents)>0:
                     if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 1:
                         flat[agents[cur][0]-1][agents[cur][1]-1] = 0
