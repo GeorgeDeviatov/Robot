@@ -77,6 +77,12 @@ if __name__ == "__main__":
     textcur = fontcur.render(str(cur),True,THECOLORS['purple'])
     screen.blit(textcur,(vx+50,vy+50))
     
+    #Отрисвка введёного числа во время ввода номера робота
+    num = ""
+    fontsee = pg.font.SysFont('corbel',50)
+    textsee = fontsee.render(num,True,THECOLORS['white'])
+    screen.blit(textsee,(200,vy+150))
+    
     #Кнопка вкл./выкл.
     butcoor = [(vx+vx*0.2,vy*0.2),(vx+vx*0.2,vy*0.4),(vx+vx*0.4,vy*0.4),
                                                      (vx+vx*0.4,vy*0.2)]
@@ -92,8 +98,12 @@ if __name__ == "__main__":
     counbutcoor = [(110,vy+120),(110,vy+180),(170,vy+180),(170,vy+120)]
     pg.draw.polygon(screen,colforchoose,counbutcoor)
     
+    
+    
+    
     nowof = True
-    num = ""
+    was = nowof
+    
     #Всякая Информация вне экрана
     
     
@@ -120,6 +130,12 @@ if __name__ == "__main__":
         #Отрисовка номера текущего робота
         textcur = fontcur.render(str(cur),True,THECOLORS['purple'])
         screen.blit(textcur,(vx+50,vy+50))
+        
+        #Отрисвка введёного числа во время ввода номера робота
+        if not(nowof) and was:
+            textsee = fontsee.render(str(num),True,THECOLORS['white'])
+            screen.blit(textsee,(200,vy+150))
+        
         
         #Если выключно то поменять цвет тескта и сам текст и наоборот
         if len(agents)>0 and agents[cur][2]:
@@ -185,6 +201,17 @@ if __name__ == "__main__":
             if event.type == pg.KEYDOWN:
                 if not(nowof):
                     num+=(pg.key.name(event.key))
+                    try:
+                        num = int(num)
+                        if not(num<len(agents)): 
+                            nowof = not(nowof)
+                            num = ''
+                        else:
+                            num=str(num)
+                    except:
+                        nowof = not(nowof)
+                        num = ''
+                    
                 if event.key == pg.K_SPACE and len(agents)>0:
                     if agents[cur][2] and flat[agents[cur][0]-1][agents[cur][1]-1] == 1:
                         flat[agents[cur][0]-1][agents[cur][1]-1] = 0
