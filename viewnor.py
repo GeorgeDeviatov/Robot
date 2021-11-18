@@ -225,6 +225,15 @@ if __name__ == "__main__":
                 if event.key == pg.K_k and len(agents) > 0:
                     agents.pop(cur)
                     cur = 0
+                if event.key == pg.K_w:
+                    cur+=1
+                    if cur>=len(agents):
+                        cur = 0
+                if event.key == pg.K_s:
+                    cur-=1
+                    if cur<0:
+                        cur = len(agents)
+                        cur-=1
                 if len(agents)>0 and agents[cur][2]:
                     if event.key == pg.K_LEFT:
                         if agents[cur][1]>1:
